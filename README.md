@@ -30,8 +30,8 @@ Instructions:
      - DriveBuild must call onTestFinished(sid, vid) so the test generator can determine the 
        fitness value.
        
-This generator offers a module to run and calculate the fitness value local in beamngpy. If you 
-don't need it, skip now to Troubleshooting.
+This generator offers a module to run and calculate the fitness value local in beamngpy, in case if
+DriveBuild doesn't work for you. If you don't need it, skip now to Troubleshooting.
 Additionally install the the requirements of requirements_local.txt. Before running run_local.py in
 the utils directory you must follow these steps:
        
