@@ -103,12 +103,11 @@ class TestGenerator:
             new_point = self._generate_random_point(control_points[-1])
             temp_list = deepcopy(control_points)
             temp_list.append(new_point)
-            control_points_lines = convert_points_to_lines(temp_list)
             spline_list = self._bspline(temp_list, 120)
-            linestring_list = self._get_width_lines(spline_list)
-
+            control_points_lines = convert_points_to_lines(spline_list)
+            width_list = self._get_width_lines(spline_list)
             if not (intersection_check_last(control_points, new_point) or spline_intersection_check(spline_list)
-                    or intersection_check_width(linestring_list, control_points_lines)):
+                    or intersection_check_width(width_list, control_points_lines)):
                 control_points.append(new_point)
                 iterator = iterator + 1
                 tries = 0
@@ -182,12 +181,12 @@ class TestGenerator:
                 valid = False
                 tries = 0
                 while not valid and tries < self.MAX_TRIES / 10:
-                    new_point = self._generate_random_point(individual[0][iterator])
+                    new_point = self._generate_random_point(individual[0][iterator - 1])
                     new_point = (new_point[0], new_point[1])
                     temp_list = deepcopy(individual[0])
                     temp_list[iterator] = new_point
-                    control_points_lines = convert_points_to_lines(temp_list)
                     spline_list = self._bspline(temp_list, 60)
+                    control_points_lines = convert_points_to_lines(spline_list)
                     linestring_list = self._get_width_lines(spline_list)
                     if not (intersection_check_all(spline_list)
                             or intersection_check_width(linestring_list, control_points_lines)):
@@ -213,23 +212,23 @@ class TestGenerator:
         iterator = 1
         tries = 0
         while tries < self.MAX_TRIES / 5:
-            child1 = deepcopy(parent1)
-            child2 = deepcopy(parent2)
             while iterator < smaller_index:
+                child1 = deepcopy(parent1)
+                child2 = deepcopy(parent2)
                 if random() <= probability:
                     children = self._recombination(child1[0], child2[0], iterator)
                     child1 = children[0]
                     child2 = children[1]
+                    width_list1 = self._get_width_lines(self._bspline(child1[0]))
+                    width_list2 = self._get_width_lines(self._bspline(child2[0]))
+                    control_lines1 = convert_points_to_lines(self._bspline(child1[0]))
+                    control_lines2 = convert_points_to_lines(self._bspline(child2[0]))
+                    if not (intersection_check_all(child1[0])
+                            or intersection_check_all(child2[0])
+                            or intersection_check_width(width_list1, control_lines1)
+                            or intersection_check_width(width_list2, control_lines2)):
+                        return [child1, child2]
                 iterator += 1
-            width_list1 = self._get_width_lines(self._bspline(child1[0]))
-            width_list2 = self._get_width_lines(self._bspline(child2[0]))
-            control_lines1 = convert_points_to_lines(self._bspline(child1[0]))
-            control_lines2 = convert_points_to_lines(self._bspline(child2[0]))
-            if not (intersection_check_all(child1[0])
-                    or intersection_check_all(child2[0])
-                    or intersection_check_width(width_list1, control_lines1)
-                    or intersection_check_width(width_list2, control_lines2)):
-                return [child1, child2]
             tries += 1
         return [parent1, parent2]
 
@@ -300,7 +299,7 @@ class TestGenerator:
         """
         if length == 0:
             return 0
-        return (self.WIDTH_OF_STREET / length) + 2
+        return self.WIDTH_OF_STREET / length
 
     def _get_width_lines(self, control_points):
         """Determines the width lines of the road by flipping the LineString
@@ -330,6 +329,21 @@ class TestGenerator:
 
             line = LineString([line_rot1.coords[1], line_rot2.coords[1]])
             linestring_list.append(line)
+
+            if iterator == len(spline_list) - 2:
+                line = LineString([p1, p2])
+                line_rot1 = affinity.rotate(line, -90, line.coords[1])
+                line_rot1 = affinity.scale(line_rot1, xfact=self._get_resize_factor(line_rot1.length),
+                                           yfact=self._get_resize_factor(line_rot1.length),
+                                           origin=line_rot1.coords[0])
+
+                line_rot2 = affinity.rotate(line, 90, line.coords[1])
+                line_rot2 = affinity.scale(line_rot2, xfact=self._get_resize_factor(line_rot2.length),
+                                           yfact=self._get_resize_factor(line_rot2.length),
+                                           origin=line_rot2.coords[0])
+                line = LineString([line_rot1.coords[1], line_rot2.coords[1]])
+                line = affinity.scale(line, xfact=self._get_resize_factor(line.length)*2, yfact=self._get_resize_factor(line.length)*2)
+                linestring_list.append(line)
             iterator += 1
         return linestring_list
 
@@ -365,11 +379,12 @@ class TestGenerator:
             self.population_list.append(child2)
 
         print(colored("Population finished.", "blue"))
-        self.population_list = self._spline_population(self.population_list)
-        build_all_xml(self.population_list, self.WIDTH_OF_STREET, self.files_name)
+        temp_list = deepcopy(self.population_list)
+        temp_list = self._spline_population(temp_list)
+        build_all_xml(temp_list, self.WIDTH_OF_STREET, self.files_name)
 
         # Comment out if you want to see the generated roads (blocks until you close all images)
-        # plot_all(self.population_list)
+        # plot_all(temp_list)
         self.population_list = self._choose_elite(self.population_list)
 
         # Introduce new individuals in the population.

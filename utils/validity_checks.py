@@ -40,7 +40,7 @@ def intersection_check_width(width_lines, control_points_lines):
                 intersections += 1
             # One line intersects always with its origin, therefore we need to check for another
             # intersection.
-            if intersections >= 2:
+            if intersections >= 3:
                 return True
             jterator += 1
         iterator += 1
