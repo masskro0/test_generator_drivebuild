@@ -13,7 +13,7 @@ def plotter(control_points):
     x = control_points[:, 0]
     y = control_points[:, 1]
 
-    plt.plot(x, y, '-og', markersize=1, linewidth=2)
+    plt.plot(x, y, '-og', markersize=10, linewidth=7)
     plt.xlim([min(x) - 0.3, max(x) + 0.3])
     plt.ylim([min(y) - 0.3, max(y) + 0.3])
 

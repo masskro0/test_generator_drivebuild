@@ -194,6 +194,9 @@ class DBCBuilder:
 
         tree.write(full_name, encoding="utf-8", xml_declaration=True)
 
+        if not path.exists(destination_path):
+            os.mkdir(destination_path)
+
         # Delete old files with the same name.
         if path.exists(destination_path + "\\" + full_name):
             remove(destination_path + "\\" + full_name)
