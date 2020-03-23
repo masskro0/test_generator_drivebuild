@@ -43,10 +43,10 @@ class TestGenerator:
         self.set_difficulty(difficulty)
 
     def _bspline(self, control_points, samples=75):
-        """ Calculate {@code samples} samples on a bspline
-        :param control_points: Array of control points
-        :param samples: Number of samples to return
-        :return: Array with samples, representing a bspline of the given function
+        """Calculate {@code samples} samples on a bspline. This is the road representation function.
+        :param control_points: Array of control points.
+        :param samples: Number of samples to return.
+        :return: Array with samples, representing a bspline of the given function as a numpy array.
         """
         control_points = np.asarray(control_points)
         count = len(control_points)
@@ -89,40 +89,36 @@ class TestGenerator:
 
     def _generate_random_points(self):
         """Generates random valid points and returns when the list is full or
-         the number of invalid nodes equals the number of maximum tries.
-         :return: Array of valid control points.
-         """
+        the number of invalid nodes equals the number of maximum tries.
+        :return: Array of valid control points.
+        """
 
         # Generating the first two points by myself.
         p0 = (1, 0)
         p1 = (65, 0)
         control_points = [p0, p1]
-        iterator = 1
         tries = 0
         while len(control_points) != self.MAX_NODES and tries <= self.MAX_TRIES:
             new_point = self._generate_random_point(control_points[-1])
             temp_list = deepcopy(control_points)
             temp_list.append(new_point)
-            spline_list = self._bspline(temp_list, 120)
+            spline_list = self._bspline(temp_list, 100)
             control_points_lines = convert_points_to_lines(spline_list)
             width_list = self._get_width_lines(spline_list)
             if not (intersection_check_last(control_points, new_point) or spline_intersection_check(spline_list)
                     or intersection_check_width(width_list, control_points_lines)):
                 control_points.append(new_point)
-                iterator = iterator + 1
                 tries = 0
             else:
                 tries += 1
 
-        if len(control_points) < self.MIN_NODES:
+        spline_list = self._bspline(control_points, 100)
+        if spline_intersection_check(spline_list):
+            control_points.pop()
+        if len(control_points) < self.MIN_NODES or intersection_check_all(spline_list):
             print(colored("Couldn't create enough valid nodes. Restarting...", "blue"))
         else:
             print(colored("Finished list!", "blue"))
-            spline_list = self._bspline(control_points)
-            if spline_intersection_check(spline_list):
-                control_points.pop()
-            if len(control_points) % 2 != 0:
-                control_points.pop()
             return control_points
 
     def _generate_random_point(self, last_point):
@@ -136,16 +132,7 @@ class TestGenerator:
         x_max = last_point[0] + self.MAX_SEGMENT_LENGTH
         y_min = last_point[1] - self.MAX_SEGMENT_LENGTH
         y_max = last_point[1] + self.MAX_SEGMENT_LENGTH
-        if x_min < 0:
-            x_min = 0
-        if y_min < 0:
-            y_min = 0
-
         tries = 0
-        x_min = int(round(x_min))
-        x_max = int(round(x_max))
-        y_min = int(round(y_min))
-        y_max = int(round(y_max))
         while tries < self.MAX_TRIES / 10:
             x_pos = randint(x_min, x_max)
             y_pos = randint(y_min, y_max)
@@ -342,7 +329,8 @@ class TestGenerator:
                                            yfact=self._get_resize_factor(line_rot2.length),
                                            origin=line_rot2.coords[0])
                 line = LineString([line_rot1.coords[1], line_rot2.coords[1]])
-                line = affinity.scale(line, xfact=self._get_resize_factor(line.length)*2, yfact=self._get_resize_factor(line.length)*2)
+                line = affinity.scale(line, xfact=self._get_resize_factor(line.length)*2,
+                                      yfact=self._get_resize_factor(line.length)*2)
                 linestring_list.append(line)
             iterator += 1
         return linestring_list
@@ -384,7 +372,7 @@ class TestGenerator:
         build_all_xml(temp_list, self.WIDTH_OF_STREET, self.files_name)
 
         # Comment out if you want to see the generated roads (blocks until you close all images)
-        # plot_all(temp_list)
+        plot_all(temp_list)
         self.population_list = self._choose_elite(self.population_list)
 
         # Introduce new individuals in the population.
