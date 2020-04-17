@@ -1,6 +1,8 @@
+from pathlib import Path
 from shutil import move
 from test_generator import TestGenerator
 import os
+from utils.xml_to_bng_files import convert_test
 
 
 def move_files(dbe, dbc):
@@ -21,9 +23,16 @@ def move_files(dbe, dbc):
 if __name__ == '__main__':
     gen = TestGenerator("easy")         # Parameter is optional, you can also call gen.set_difficulty(str)
     gen.set_files_name("test_case")     # This method call is optional
+
     while True:
         for paths in gen.getTest():
             dbe = paths[0]
             dbc = paths[1]
+            #convert_test(dbc, dbe)
             # All your code goes here
             # Be sure to call onTestFinished(sid, vid)
+
+
+    #dbe = Path("D:\\Program Files (x86)\\BeamNG\\experiment\\testgenerator\\scenario\\trafficLightsStopSignTest.dbe.xml")
+    #dbc = Path("D:\\Program Files (x86)\\BeamNG\\experiment\\testgenerator\\scenario\\trafficLightsStopSignTest.dbc.xml")
+    #convert_test(dbc, dbe)
