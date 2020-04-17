@@ -7,16 +7,32 @@ import os
 
 dbe = DBEBuilder()
 
-segment1 = [0, 0, 8]
-segment2 = [50, 0, 8]
-segment3 = [80, 20, 8]
-segment4 = [100, 20, 8]
+segment1 = {"x": 0,
+            "y": 0,
+            "width": 12}
+segment2 = {"x": 50,
+            "y": 0,
+            "width": 12}
+segment3 = {"x": 80,
+            "y": 20,
+            "width": 12}
+segment4 = {"x": 100,
+            "y": 20,
+            "width": 12}
 segments = [segment1, segment2, segment3, segment4]
 
-dbe.add_lane(segments)
+dbe.add_lane(segments, left_lanes=1, right_lanes=2)
 
-cone = ["cone", 5, 5, 5, 5]
-cylinder = ["cylinder", 10, 10, 2, 2]
+cone = {"name": "cone",
+        "x": 5,
+        "y": 5,
+        "baseRadius": 5,
+        "height": 5}
+cylinder = {"name": "cylinder",
+            "x": 10,
+            "y": 10,
+            "radius": 2,
+            "height": 2}
 obstacles = [cone, cylinder]
 
 dbe.add_obstacles(obstacles)

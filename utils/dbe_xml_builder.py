@@ -47,48 +47,69 @@ class DBEBuilder:
 
     def add_obstacles(self, obstacle_list):
         """Adds obstacles to the XML files.
-        :param obstacle_list: Array of obstacles. First value is the shape/name of the obstacles,
-                              the other parameters are defining the obstacle.
+        :param obstacle_list: List of obstacles. Each obstacle is a dict and must contain x and y position. Check
+                              generator.py in simnode in DriveBuild to see which object needs which properties.
         :return: Void.
         """
         obstacles = ElementTree.SubElement(self.root, "obstacles")
         for obstacle in obstacle_list:
-            if obstacle[0] == "cube":
-                ElementTree.SubElement(obstacles, 'cube x="{}" y="{}" width="{}" length="{}"'
-                                                  ' height="{}"'
-                                       .format(obstacle[1], obstacle[2], obstacle[3], obstacle[4],
-                                               obstacle[5]))
-            elif obstacle[0] == "cylinder":
-                ElementTree.SubElement(obstacles, 'cylinder x="{}" y="{}" radius="{}" height="{}"'
-                                       .format(obstacle[1], obstacle[2], obstacle[3], obstacle[4]))
-            elif obstacle[0] == "cone":
-                ElementTree.SubElement(obstacles, 'cone x="{}" y="{}" height="{}" baseRadius="{}"'
-                                       .format(obstacle[1], obstacle[2], obstacle[3], obstacle[4]))
-            elif obstacle[0] == "bump":
-                ElementTree.SubElement(obstacles, 'bump x="{}" y="{}" width="{}" length="{}" height="{}"'
-                                                  ' upperLength="{}" upperWidth="{}"'
-                                       .format(obstacle[1], obstacle[2], obstacle[3], obstacle[4],
-                                               obstacle[5], obstacle[6], obstacle[7]))
+            name = obstacle.get("name")
+            x = obstacle.get("x")
+            y = obstacle.get("y")
+            z = obstacle.get("z")
+            xRot = obstacle.get("xRot")
+            yRot = obstacle.get("yRot")
+            zRot = obstacle.get("zRot")
+            width = obstacle.get("width")
+            length = obstacle.get("length")
+            height = obstacle.get("height")
+            radius = obstacle.get("radius")
+            baseRadius = obstacle.get("baseRadius")
+            upperWidth = obstacle.get("upperWidth")
+            upperLength = obstacle.get("upperLength")
+            full_string = '' + name + ' x="' + str(x) + '" y="' + str(y) + '"'
+            if z:
+                full_string += ' z="' + str(z) + '"'
+            if xRot:
+                full_string += ' xRot="' + str(xRot) + '"'
+            if yRot:
+                full_string += ' yRot="' + str(yRot) + '"'
+            if zRot:
+                full_string += ' zRot="' + str(zRot) + '"'
+            if width:
+                full_string += ' width="' + str(width) + '"'
+            if length:
+                full_string += ' length="' + str(length) + '"'
+            if height:
+                full_string += ' height="' + str(height) + '"'
+            if radius:
+                full_string += ' radius="' + str(radius) + '"'
+            if baseRadius:
+                full_string += ' baseRadius="' + str(baseRadius) + '"'
+            if upperWidth:
+                full_string += ' upperWidth="' + str(upperWidth) + '"'
+            if upperLength:
+                full_string += ' upperLength="' + str(upperLength) + '"'
+            ElementTree.SubElement(obstacles, full_string)
 
-    def add_lane(self, segments, markings=True, left_lanes=0, right_lanes=0):
+    def add_lane(self, segments, markings: bool = True, left_lanes: int = 0, right_lanes: int = 0):
         """Adds a lane and road segments.
-        :param segments: Array of tuples containing nodes to generate road segments. Segments must have
-                         x-coordinate, y-coordinate and width.
+        :param segments: List of dicts containing x-coordinate, y-coordinate and width.
         :param markings: {@code True} Enables road markings, {@code False} makes them invisible.
-        :param left_lanes: number of left lanes (int)
-        :param right_lanes: number of right lanes (int)
+        :param left_lanes: number of left lanes
+        :param right_lanes: number of right lanes
         :return: Void
         """
         lane = ElementTree.SubElement(self.lanes, "lane")
         if markings:
             lane.set("markings", "true")
-        if left_lanes != 0:
-            lane.set("leftLanes", left_lanes)
-        if right_lanes != 0:
-            lane.set("rightLanes", right_lanes)
+        if left_lanes != 0 and left_lanes is not None:
+            lane.set("leftLanes", str(left_lanes))
+        if right_lanes != 0 and right_lanes is not None:
+            lane.set("rightLanes", str(right_lanes))
         for segment in segments:
             ElementTree.SubElement(lane, 'laneSegment x="{}" y="{}" width="{}"'
-                                   .format(segment[0], segment[1], segment[2]))
+                                   .format(segment.get("x"), segment.get("y"), segment.get("width")))
 
     def save_xml(self, name):
         """Creates and saves the XML file, and moves it to the scenario folder.
