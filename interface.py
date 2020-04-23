@@ -1,4 +1,3 @@
-from pathlib import Path
 from shutil import move
 from test_generator import TestGenerator
 import os
@@ -28,11 +27,6 @@ if __name__ == '__main__':
         for paths in gen.getTest():
             dbe = paths[0]
             dbc = paths[1]
-            #convert_test(dbc, dbe)
+            convert_test(dbc, dbe)
             # All your code goes here
             # Be sure to call onTestFinished(sid, vid)
-
-
-    #dbe = Path("D:\\Program Files (x86)\\BeamNG\\experiment\\testgenerator\\scenario\\trafficLightsStopSignTest.dbe.xml")
-    #dbc = Path("D:\\Program Files (x86)\\BeamNG\\experiment\\testgenerator\\scenario\\trafficLightsStopSignTest.dbc.xml")
-    #convert_test(dbc, dbe)
