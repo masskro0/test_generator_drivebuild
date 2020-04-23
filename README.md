@@ -28,27 +28,12 @@ Instructions:
        set_files_name(str) ["easy", "medium", "hard"] but these are optional.
        
      - DriveBuild must call onTestFinished(sid, vid) so the test generator can determine the 
-       fitness value.
+       fitness value after test execution.
        
-This generator offers a module to run and calculate the fitness value local in beamngpy, in case if
-DriveBuild doesn't work for you. If you don't need it, skip now to Troubleshooting.
-Additionally install the the requirements of requirements_local.txt. Before running run_local.py in
-the utils directory you must follow these steps:
-       
-    - Mainapp and Simnode must be listening for connections and requests before running the
-      test generator
-    - run_local.py: You must change two paths. The first one points to the directory where
-      DriveBuild stores its created JSON, LUA and PREFAB files. It is in the user path, e.g.
-      "C:\\Users\\MaSSK\\Documents\\BeamNG.research", where several drivebuild directories
-      are created, e.g. drivebuild10.
-      The second path is your trunk folder. Go to your BeamNG trunk folder (where you have
-      installed BeamNG) and go to the levels directory. If you haven't already then create
-      a directory called "drivebuild" and in there a directory called "scenarios". Change
-      the destination_path to the scenarios path, e.g. 
-      'D:\\Program Files (x86)\\BeamNG\\levels\\drivebuild\\scenarios'. 
-    - Put your trained model in ai/models, your prediction in ai (optional) and your AI car
-      in test_subjects. Of course this is dependent on your implementation.
-    
+In case that DriveBuild is not working for you, you can use the convert_test function like
+in interface.py. This will use DriveBuild to convert the xml files into game files and
+automatically move it to the scenario folder. You have to change the paths in
+xml_to_bng_files.py. Make sure that Mainapp as well as SimNode of DriveBuild are running.
     
 Troubleshooting:
 
@@ -56,9 +41,9 @@ Troubleshooting:
        the test cases, then you have to restart SimNode and the test generator/test execution.
      - Don't worry if generating points or mutation seems to be stuck. These operations are
        computationally heavy and need some time to finish. In the worst case you have to wait
-       up to 120 seconds.
+       up to 30 seconds.
      - If you get any file errors, try to delete everything from the scenario and done folder
-     - If no progress is made after 4 minutes, restart the test generator and DriveBuild, which
+     - If no progress is made after 1 minute, restart the test generator and DriveBuild, which
        is caused by some false configuration probably.
    
     

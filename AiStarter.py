@@ -88,17 +88,7 @@ def main():
             # Interact with a simulation
             if submission_result and submission_result.submissions:
                 for test_name, sid in submission_result.submissions.items():
-                    # with ...
-
-
-                    # Michael, Tim, Felix
                     ai_process = subprocess.Popen([env_path, ai_path, sid.sid], cwd=working_directory)
-
-                    # Manoj, Yuki, Dinesh
-                    # ai_process = subprocess.Popen(["C:\\sbse4tac-ws-2019-self-driving-car-smartcars\\.venv\\Scripts\\python.exe",
-                    #                               "C:\\sbse4tac-ws-2019-self-driving-car-smartcars\\integration_with_DriveBuild\\trained_ai.py",
-                    #                               sid.sid],
-                    #                            cwd="C:\\sbse4tac-ws-2019-self-driving-car-smartcars\\integration_with_DriveBuild")
 
                     sim_state = service.wait_for_simulator_request(sid, vid)
                     while sim_state is SimStateResponse.SimState.RUNNING:
