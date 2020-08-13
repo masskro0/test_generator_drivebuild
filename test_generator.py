@@ -479,9 +479,9 @@ class TestGenerator:
         """
         destination_path = path.dirname(path.realpath(__file__)) + "\\scenario"
         xml_names = destination_path + "\\" + self.files_name + "*"
-        matches = glob(xml_names)
         iterator = 0
         self.genetic_algorithm()
+        matches = glob(xml_names)
         while iterator < self.POPULATION_SIZE * 2 - 1:
             yield Path(matches[iterator + 1]), Path(matches[iterator])
             iterator += 2
